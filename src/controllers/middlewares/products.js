@@ -45,17 +45,54 @@ function createProductsMiddlewares (models) {
         next()
     }
 
-    let client = undefined
-    const getRedisClient =() => {
-        if (!client) {
-            client = redis.createClient()
+    let redisClient = undefined
+    const getRedisClient = () => {
+        if (!redisClient) {
+            redisClient = redis.createClient()
+            redisClient.on("error", (error) => {
+                console.log(chalk.red("Redis client error", error))
+            })
         }
+        
+        return redisClient
+    }
+
+    const storeProductsDataInCache = async (client) => {
+        const products = await models.Products.find()
+        client.set("products", JSON.stringify(products))
+    }
+
+    const useCache = (req, res, next) => {
+        const client = getRedisClient()
+        const key = "products"
+        client.get(key, async (error, data) => {
+            if (!data) {
+                storeProductsDataInCache(client)
+                next()
+            }
+            if (error) {
+                res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Something went wrong... :(" })
+                return
+            }
+            
+            res.status(statusCode.OK).send(data)
+        })        
     }
     
+    const deleteCache = (req, res, next) => {
+        const client = getRedisClient()
+        const key = "products"
+        client.DEL(key)
+
+        next()
+    }
+
     return {
         createProduct,
         modifyProduct,
-        deleteProduct
+        deleteProduct,
+        useCache,
+        deleteCache
     }
 }
 

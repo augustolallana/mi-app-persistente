@@ -13,25 +13,27 @@ function productsRouterSetup (models) {
     const {
         createProduct,
         modifyProduct,
-        deleteProduct
+        deleteProduct,
+        useCache,
+        deleteCache
     } = createProductsMiddlewares(models)
 
     router.use(isLogged)
 
-    router.get("/", async (req, res) => {
-        const allProducts = await models.Products.find()
-        res.json(allProducts)
+    router.get("/", useCache, async (req, res) => {
+        const products = await models.Products.find()
+        res.status(statusCode.OK).json(products)
     })
     
-    router.post("/", createProduct, (req, res) => {
+    router.post("/", createProduct, deleteCache, (req, res) => {
         res.status(statusCode.CREATED).json({ message: "Product created successfully" })
     })
     
-    router.put("/:name", modifyProduct, (req, res) => {
+    router.put("/:name", modifyProduct, deleteCache, (req, res) => {
         res.status(statusCode.OK).json({ message: "Product updated successfully" })
     })
     
-    router.delete("/:name", deleteProduct, (req, res) => {
+    router.delete("/:name", deleteProduct, deleteCache, (req, res) => {
         res.status(statusCode.OK).json({ message: "Product deleted successfully" })
     })
 
