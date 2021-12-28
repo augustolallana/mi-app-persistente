@@ -27,12 +27,12 @@ function connect () {
             const Users = createUserModel()
             const Products = createProductModel()
             const Orders = createOrderModel()
-            const PaymentMethod = createPaymentMethodModel() 
+            const PaymentMethods = createPaymentMethodModel()
             resolve({
                 Users,
                 Products,
                 Orders,
-                PaymentMethod
+                PaymentMethods
             })
         })
     })

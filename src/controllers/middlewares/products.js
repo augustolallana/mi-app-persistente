@@ -1,4 +1,3 @@
-const chalk = require("chalk")
 const redis = require("redis")
 const statusCode = require("../status")
 
@@ -66,16 +65,18 @@ function createProductsMiddlewares (models) {
         const client = getRedisClient()
         const key = "products"
         client.get(key, async (error, data) => {
-            if (!data) {
-                storeProductsDataInCache(client)
-                next()
-            }
             if (error) {
                 res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Something went wrong... :(" })
                 return
             }
-            
-            res.status(statusCode.OK).send(data)
+            if (!data) {
+                storeProductsDataInCache(client)
+                next()
+            }
+            if (data) {
+                res.status(statusCode.OK).send(data)
+                return
+            }
         })        
     }
     

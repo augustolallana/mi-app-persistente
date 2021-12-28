@@ -18,9 +18,13 @@ function global4RouterMiddlewaresSetup (models) {
                 
         next()
     }
+
+    const isAdmin = (req, res, next) => {
+    }
     
     return {
-        isLogged
+        isLogged,
+        isAdmin
     }
 }
 

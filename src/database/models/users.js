@@ -7,7 +7,8 @@ const userSchema = {
     email: String,
     celphoneNumber: Number,
     addresses: [String],
-    password: String
+    password: String,
+    isAdmin: Boolean
 }
 
 function createUserModel () {
